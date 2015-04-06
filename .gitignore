@@ -1,0 +1,9 @@
+#	Vim SWP files
+*.swp
+*.swo
+*.sw*
+*.~
+
+#	Compiled source files
+*.o
+
