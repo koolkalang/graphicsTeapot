@@ -1,37 +1,11 @@
-Christian Weeks
-CPSC 605 - Show Me the Bunny!
+Christian Weeks and Paulo Usero
+CPSC 605 - final project 
 Dr. Robert Geist
-Due 3 March 2015
+Due 23 April 2015
 
-Features:
+Compiling and running:
 
-Required:
-	-Vertex Buffers
-	-Phong Shading
-	-Normalized Blinn-Phong Shader
-	-Anti Aliasing
-		-AA method deviated slightly from the method we used in class, but smooths the edges just as well
-Extra:
-	Primitive scene rotation -
-		a, d rotate the MV matrix about the Y axis
-		w, s rotate the MV matrix about the X axis
-		r, f rotate the MV matrix about the Z axis
+>make
+>./run <objectFileName>.obj
 
 
-Compiling and Running:
-
->g++ -g -Wall caweeks_bunny.cpp -o run -lm -lglut -lGL -lGLU -lGLEW
->./run bunny.obj
-
-
-Comments:
-When I see a bunny model like this, I think of chocolate Easter bunnies, so I decided to try to make it look like chocolate.  I
-jumped around between different shininess values for the material before settling on the one I have now.  As much as I feel tempted
-to use wildly different colored lights and materials, I think plain white lights work best here.  The rim light is slightly yellow, but
-the key and fills are still white.
-
-The file is .cpp even though the code is entirely C.  I wasn't sure if I wanted to use vectors when reading in the file, and the inclusion
-of the GLEW library fixed a few warnings gcc was throwing.  I decided not to use vectors because I feel like they would be slower than
-passing the file twice and counting the number of vertices / faces before reading them in.  I didn't test it, though, so I'm probably wrong.
-I messed around with the shader as well and made a toon shader that colored fragments based on the angle between the view vector and its 
-reflected vector.  It was too silly to include.
