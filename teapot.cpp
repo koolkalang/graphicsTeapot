@@ -3,8 +3,9 @@
 OBJObject *Bunny;
 const double JITTER = 0.007;
 const int AA_PASSES = 20;
+const int verticesPerFace = 4;
 
-const point eye = {4,4,4};
+const point eye = {3,3,3};
 const point view = {0,.8,0};
 const point up = {0,1,0};
 
@@ -118,8 +119,9 @@ void create_material(){
 
 
 GLuint myBuffer = 1;
-GLuint BVertBuffer = 2;
-GLuint BIndexBuffer = 3;
+GLuint vertBuffer = 2;
+GLuint normBuffer = 3;
+GLuint indexBuffer = 4;
 
 void rotate(int angle, int x, int y, int z){
 	glTranslatef(.1,0,.1);
@@ -133,10 +135,15 @@ void keyBindings(unsigned char key, int x, int y)
 switch(key) {
         case 'q':               
                 glDeleteBuffers(1,&myBuffer);
-                glDeleteBuffers(1,&BVertBuffer);
-                glDeleteBuffers(1,&BIndexBuffer);
+                glDeleteBuffers(1,&vertBuffer);
+                glDeleteBuffers(1,&normBuffer);
+                glDeleteBuffers(1,&indexBuffer);
 				free(Bunny->vertices);
+				free(Bunny->vertNormals);
+				free(Bunny->texCoords);
 				free(Bunny->vIndices);
+				free(Bunny->vNIndices);
+				free(Bunny->texIndices);
 				free(Bunny);
                 exit(1);
 				break;
@@ -190,7 +197,24 @@ unsigned int set_shaders(){
 
 void draw_stuff(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	glDrawElements(GL_TRIANGLES, Bunny->fCount*3, GL_UNSIGNED_INT, (void*)0);
+	//mode, count, type, starting pointer 
+	glBegin(GL_QUADS);
+	int i = 0;
+	int j = 0;
+	int vertIndex, faceIndex, normIndex;
+	for(i = 0; i < Bunny->fCount; i++){
+		faceIndex = 4*i;
+		for(j = 0; j < 4; j++){
+			normIndex = 3*Bunny->vNIndices[faceIndex + j];
+			glNormal3f(Bunny->vertNormals[normIndex],Bunny->vertNormals[normIndex+1],Bunny->vertNormals[normIndex+2]);
+			vertIndex = 3*Bunny->vIndices[faceIndex + j];
+			
+			glVertex3f(Bunny->vertices[vertIndex],Bunny->vertices[vertIndex+1],Bunny->vertices[vertIndex+2]);
+		}
+
+	}
+	glEnd();
+//	glDrawElements(GL_QUADS, Bunny->fCount*4, GL_UNSIGNED_INT, (void*)0);
 	//glutSwapBuffers() commented out while Anti Aliasing is active - must be put back in if AA is turned off
 //	glutSwapBuffers();
 }
@@ -215,9 +239,10 @@ void draw_AA(){
 
 int main(int argc, char **argv){
 
-	Bunny = new OBJObject;
+	Bunny = (OBJObject*)calloc(sizeof(OBJObject), 1);
+	GLuint program;
 
-	parseObj(argv[1], Bunny);
+	parseObj(argv[1], Bunny, verticesPerFace);
 
 	//standard Init routine
 	glutInit(&argc, argv);
@@ -239,18 +264,34 @@ int main(int argc, char **argv){
 	Init();
 	create_lights();
 	create_material();
-	set_shaders();
+	program = set_shaders();
 
-	glBindBuffer(GL_ARRAY_BUFFER, BVertBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*Bunny->vCount*3*2, Bunny->vertices, GL_STATIC_DRAW);
-
+	glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*Bunny->vCount*3, Bunny->vertices, GL_STATIC_DRAW);
+	
+	//size, type, stride, starting pointer
 	glVertexPointer(3, GL_FLOAT, 3*sizeof(GLfloat), (GLvoid*)0);
-		glNormalPointer(GL_FLOAT, 3*sizeof(GLfloat),(GLvoid*)((3*Bunny->vCount)*sizeof(GLfloat)));
+
+	glBindBuffer(GL_ARRAY_BUFFER, normBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*Bunny->vCount*3, Bunny->vertNormals, GL_STATIC_DRAW);
+	//type, stride, starting pointer
+	glNormalPointer(GL_FLOAT, 3*sizeof(GLfloat),(GLvoid*)0);
+
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+	//buffer binding target, size, data pointer, usage
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*Bunny->fCount*verticesPerFace*3, Bunny->vIndices, GL_STATIC_DRAW);
 	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BIndexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*Bunny->fCount*3*2, Bunny->vIndices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BIndexBuffer);
-	
+/*	GLsizei stride = sizeof(GLuint)*Bunny->fCount*verticesPerFace;
+	GLuint attribute;
+	//making sure vertex indices work properly
+	attribute = glGetAttribLocation(program, "VertexPosition");
+	glEnableVertexAttribArray(attribute);
+	glVertexAttribPointer(attribute, 3, GL_FLOAT, GL_FALSE, stride, 0);
+
+	//making sure vertex normal indices work properly
+	attribute = glGetAttribLocation(program, "VertexNormal");
+	glEnableVertexAttribArray(attribute);
+	glVertexAttribPointer(attribute, 3, GL_FLOAT, GL_FALSE, stride, 0);*/
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glutDisplayFunc(draw_AA);
