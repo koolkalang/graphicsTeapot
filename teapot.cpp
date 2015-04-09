@@ -26,7 +26,7 @@ void Init(){
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, 1.0, 0.1, 20.0);
+	gluPerspective(65.0, 1.78, 0.1, 20.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -214,6 +214,15 @@ void draw_stuff(){
 
 	}
 	glEnd();
+
+
+	glBegin(GL_QUADS);
+		glNormal3f(0,1,0);	
+		glVertex3f(-3,0,-3);	
+		glVertex3f(-3,0, 3);	
+		glVertex3f( 3,0, 3);	
+		glVertex3f( 3,0,-3);	
+	glEnd();
 //	glDrawElements(GL_QUADS, Bunny->fCount*4, GL_UNSIGNED_INT, (void*)0);
 	//glutSwapBuffers() commented out while Anti Aliasing is active - must be put back in if AA is turned off
 //	glutSwapBuffers();
@@ -248,7 +257,7 @@ int main(int argc, char **argv){
 	glutInit(&argc, argv);
 
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DEPTH|GLUT_DOUBLE|GLUT_ACCUM);
-	glutInitWindowSize(1024,1024);
+	glutInitWindowSize(1280,720);
 	glutInitWindowPosition(200, 50);
 	glutCreateWindow("Test Window");
 

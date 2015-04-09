@@ -53,10 +53,10 @@ int parseObj(char *fileName, OBJObject *container, int vPerF){
 	container->texCoords = (GLfloat *)calloc(sizeof(GLfloat), 2*vtCount);
 	
 	//3 * total vertices / face * faces for the vertex index, texture index, and normal index
-	container->vIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount*100);
+	container->vIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount);
 
-	container->vNIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount*100);
-	container->texIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount*100);
+	container->vNIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount);
+	container->texIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount);
 
 	contentDup = strdup(content);	
 	line = strtok(contentDup, "\n");	
