@@ -8,7 +8,9 @@ const int verticesPerFace = 4;
 const point eye = {3,3,3};
 const point view = {0,.8,0};
 const point up = {0,1,0};
-
+// Used to reference the different shaders.
+GLuint teapotShader;
+GLuint planeShader;
 
 point jitter_view()
 {
@@ -171,7 +173,7 @@ switch(key) {
     }
 }
 
-unsigned int set_shaders(){
+unsigned int set_shaders(char *fragFile, char *vertFile){
 
 	char *vs, *fs;
 	GLuint v, f, p;
@@ -179,8 +181,8 @@ unsigned int set_shaders(){
 	v = glCreateShader(GL_VERTEX_SHADER);
 	f = glCreateShader(GL_FRAGMENT_SHADER);
 
-	vs = readFile((char *)"phongEC.vert");
-	fs = readFile((char *)"phongEC.frag");
+	vs = readFile(vertFile);
+	fs = readFile(fragFile);
 	glShaderSource(v, 1, (const char **)&vs, NULL);
 	glShaderSource(f, 1, (const char **)&fs, NULL);
 	free(vs);
@@ -198,7 +200,9 @@ unsigned int set_shaders(){
 void draw_stuff(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	//mode, count, type, starting pointer 
+	glUseProgram(teapotShader);
 	glBegin(GL_QUADS);
+
 	int i = 0;
 	int j = 0;
 	int vertIndex, faceIndex, normIndex;
@@ -216,13 +220,26 @@ void draw_stuff(){
 	glEnd();
 
 
+	glUseProgram(planeShader);
+
+	// Mirror Quad
 	glBegin(GL_QUADS);
+
 		glNormal3f(0,1,0);	
-		glVertex3f(-3,0,-3);	
-		glVertex3f(-3,0, 3);	
-		glVertex3f( 3,0, 3);	
-		glVertex3f( 3,0,-3);	
+
+		glVertex3f(-3,0,-3);
+		glVertex3f(-3,0,3);
+		glVertex3f(3,0,3);
+		glVertex3f(3,0,-3);
+/*
+		glVertex3f(-4.6919, 6.7599, -0.6532);	
+		glVertex3f(1.6748, -3.3882, 0.6841);	
+		glVertex3f(10.0216, -4.8014, 8.7911);	
+		glVertex3f(13.0387, 5.3467, 7.4536);	
+*/
+		// scaled down vertices
 	glEnd();
+
 //	glDrawElements(GL_QUADS, Bunny->fCount*4, GL_UNSIGNED_INT, (void*)0);
 	//glutSwapBuffers() commented out while Anti Aliasing is active - must be put back in if AA is turned off
 //	glutSwapBuffers();
@@ -249,7 +266,6 @@ void draw_AA(){
 int main(int argc, char **argv){
 
 	Bunny = (OBJObject*)calloc(sizeof(OBJObject), 1);
-	GLuint program;
 
 	parseObj(argv[1], Bunny, verticesPerFace);
 
@@ -273,7 +289,8 @@ int main(int argc, char **argv){
 	Init();
 	create_lights();
 	create_material();
-	program = set_shaders();
+	teapotShader = set_shaders((char *) "phongEC.frag",(char *) "phongEC.vert");
+	planeShader = set_shaders((char *) "phongEC2.frag",(char *) "phongEC2.vert");
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*Bunny->vCount*3, Bunny->vertices, GL_STATIC_DRAW);
