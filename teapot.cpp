@@ -1,6 +1,7 @@
 #include "teapot.h"
 
-OBJObject *Bunny;
+OBJObject *primaryOBJ;
+textureUnit *bubbleTex;
 const double JITTER = 0.007;
 const int AA_PASSES = 20;
 const int verticesPerFace = 4;
@@ -8,6 +9,10 @@ const int verticesPerFace = 4;
 const point eye = {3,3,3};
 const point view = {0,.8,0};
 const point up = {0,1,0};
+const GLuint myBuffer = 1;
+const GLuint vertBuffer = 2;
+const GLuint normBuffer = 3;
+const GLuint indexBuffer = 4;
 
 
 point jitter_view()
@@ -26,7 +31,7 @@ void Init(){
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, 1.0, 0.1, 20.0);
+	gluPerspective(45.0, 1.78, 0.1, 20.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -34,8 +39,6 @@ void Init(){
 			view.x, view.y, view.z,
 			up.x, up.y, up.z);
 }
-
-
 
 void create_lights(){
 	//KEY LIGHT
@@ -116,13 +119,6 @@ void create_material(){
 	glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess);
 }
 
-
-
-GLuint myBuffer = 1;
-GLuint vertBuffer = 2;
-GLuint normBuffer = 3;
-GLuint indexBuffer = 4;
-
 void rotate(int angle, int x, int y, int z){
 	glTranslatef(.1,0,.1);
 	glRotatef(angle, x, y, z);
@@ -138,13 +134,15 @@ switch(key) {
                 glDeleteBuffers(1,&vertBuffer);
                 glDeleteBuffers(1,&normBuffer);
                 glDeleteBuffers(1,&indexBuffer);
-				free(Bunny->vertices);
-				free(Bunny->vertNormals);
-				free(Bunny->texCoords);
-				free(Bunny->vIndices);
-				free(Bunny->vNIndices);
-				free(Bunny->texIndices);
-				free(Bunny);
+				free(primaryOBJ->vertices);
+				free(primaryOBJ->vertNormals);
+				free(primaryOBJ->texCoords);
+				free(primaryOBJ->vIndices);
+				free(primaryOBJ->vNIndices);
+				free(primaryOBJ->texIndices);
+				free(primaryOBJ->tangents);
+				free(primaryOBJ->bitangents);
+				free(primaryOBJ);
                 exit(1);
 				break;
 		//rotate left
@@ -201,20 +199,25 @@ void draw_stuff(){
 	glBegin(GL_QUADS);
 	int i = 0;
 	int j = 0;
-	int vertIndex, faceIndex, normIndex;
-	for(i = 0; i < Bunny->fCount; i++){
+	int vertIndex, faceIndex, normIndex, texIndex;
+	for(i = 0; i < primaryOBJ->fCount; i++){
 		faceIndex = 4*i;
 		for(j = 0; j < 4; j++){
-			normIndex = 3*Bunny->vNIndices[faceIndex + j];
-			glNormal3f(Bunny->vertNormals[normIndex],Bunny->vertNormals[normIndex+1],Bunny->vertNormals[normIndex+2]);
-			vertIndex = 3*Bunny->vIndices[faceIndex + j];
-			
-			glVertex3f(Bunny->vertices[vertIndex],Bunny->vertices[vertIndex+1],Bunny->vertices[vertIndex+2]);
+			normIndex = 3*primaryOBJ->vNIndices[faceIndex + j];
+			glNormal3f(primaryOBJ->vertNormals[normIndex],primaryOBJ->vertNormals[normIndex+1],primaryOBJ->vertNormals[normIndex+2]);
+
+			texIndex = 2*primaryOBJ->texIndices[faceIndex+j];	
+			glTexCoord2f(primaryOBJ->texCoords[texIndex], primaryOBJ->texCoords[texIndex+1]);
+	//		if(i < 10)
+	//			printf("texIndex:%d\ntexCoordu:%f\n", texIndex, primaryOBJ->texCoords[texIndex]);
+
+			vertIndex = 3*primaryOBJ->vIndices[faceIndex + j];	
+			glVertex3f(primaryOBJ->vertices[vertIndex],primaryOBJ->vertices[vertIndex+1],primaryOBJ->vertices[vertIndex+2]);
 		}
 
 	}
 	glEnd();
-//	glDrawElements(GL_QUADS, Bunny->fCount*4, GL_UNSIGNED_INT, (void*)0);
+//	glDrawElements(GL_QUADS, primaryOBJ->fCount*4, GL_UNSIGNED_INT, (void*)0);
 	//glutSwapBuffers() commented out while Anti Aliasing is active - must be put back in if AA is turned off
 //	glutSwapBuffers();
 }
@@ -239,16 +242,16 @@ void draw_AA(){
 
 int main(int argc, char **argv){
 
-	Bunny = (OBJObject*)calloc(sizeof(OBJObject), 1);
+	primaryOBJ = (OBJObject*)calloc(sizeof(OBJObject), 1);
 	GLuint program;
 
-	parseObj(argv[1], Bunny, verticesPerFace);
+	parseObj(argv[1], primaryOBJ, verticesPerFace);
 
 	//standard Init routine
 	glutInit(&argc, argv);
 
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DEPTH|GLUT_DOUBLE|GLUT_ACCUM);
-	glutInitWindowSize(1024,1024);
+	glutInitWindowSize(1920,1080);
 	glutInitWindowPosition(200, 50);
 	glutCreateWindow("Test Window");
 
@@ -261,27 +264,35 @@ int main(int argc, char **argv){
 	glClearColor(0.1, 0.1, 0.1, 0.0);
 	glClearAccum(0.0, 0.0, 0.0, 0.0);
 	glEnable(GL_DEPTH_TEST);
+	bubbleTex = (textureUnit*)calloc(sizeof(textureUnit), 1);
+	bubbleTex->name = "bubble_color.ppm";
+	bubbleTex->texID = 1;
+	bubbleTex->format = GL_RGB;
+	bubbleTex->alpha = NULL_A;
+	bubbleTex->texunit = GL_TEXTURE0;
+	bubbleTex->combine = GL_MODULATE;
+	load_textures(bubbleTex);
 	Init();
 	create_lights();
 	create_material();
 	program = set_shaders();
-
+/*
 	glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*Bunny->vCount*3, Bunny->vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*primaryOBJ->vCount*3, primaryOBJ->vertices, GL_STATIC_DRAW);
 	
 	//size, type, stride, starting pointer
 	glVertexPointer(3, GL_FLOAT, 3*sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, normBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*Bunny->vCount*3, Bunny->vertNormals, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*primaryOBJ->vCount*3, primaryOBJ->vertNormals, GL_STATIC_DRAW);
 	//type, stride, starting pointer
 	glNormalPointer(GL_FLOAT, 3*sizeof(GLfloat),(GLvoid*)0);
 
 //	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	//buffer binding target, size, data pointer, usage
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*Bunny->fCount*verticesPerFace*3, Bunny->vIndices, GL_STATIC_DRAW);
-	
-/*	GLsizei stride = sizeof(GLuint)*Bunny->fCount*verticesPerFace;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*primaryOBJ->fCount*verticesPerFace*3, primaryOBJ->vIndices, GL_STATIC_DRAW);
+*/	
+/*	GLsizei stride = sizeof(GLuint)*primaryOBJ->fCount*verticesPerFace;
 	GLuint attribute;
 	//making sure vertex indices work properly
 	attribute = glGetAttribLocation(program, "VertexPosition");

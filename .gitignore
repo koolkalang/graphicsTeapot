@@ -6,4 +6,5 @@
 
 #	Compiled source files
 *.o
+*.d
 
