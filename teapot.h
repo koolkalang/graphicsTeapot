@@ -9,6 +9,5 @@
 #include<GL/glew.h>
 #include<GL/gl.h>
 #include<GL/glut.h>
-#include "util.h"
-#include "fileParser.h"
+#include "model.h"
 #include "readTexture.h"

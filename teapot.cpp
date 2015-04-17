@@ -1,6 +1,6 @@
 #include "teapot.h"
 
-OBJObject *primaryOBJ;
+model* primaryOBJ;
 textureUnit *bubbleTex;
 const double JITTER = 0.007;
 const int AA_PASSES = 20;
@@ -134,15 +134,7 @@ switch(key) {
                 glDeleteBuffers(1,&vertBuffer);
                 glDeleteBuffers(1,&normBuffer);
                 glDeleteBuffers(1,&indexBuffer);
-				free(primaryOBJ->vertices);
-				free(primaryOBJ->vertNormals);
-				free(primaryOBJ->texCoords);
-				free(primaryOBJ->vIndices);
-				free(primaryOBJ->vNIndices);
-				free(primaryOBJ->texIndices);
-				free(primaryOBJ->tangents);
-				free(primaryOBJ->bitangents);
-				free(primaryOBJ);
+				delete primaryOBJ;
                 exit(1);
 				break;
 		//rotate left
@@ -195,28 +187,7 @@ unsigned int set_shaders(){
 
 void draw_stuff(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	//mode, count, type, starting pointer 
-	glBegin(GL_QUADS);
-	int i = 0;
-	int j = 0;
-	int vertIndex, faceIndex, normIndex, texIndex;
-	for(i = 0; i < primaryOBJ->fCount; i++){
-		faceIndex = 4*i;
-		for(j = 0; j < 4; j++){
-			normIndex = 3*primaryOBJ->vNIndices[faceIndex + j];
-			glNormal3f(primaryOBJ->vertNormals[normIndex],primaryOBJ->vertNormals[normIndex+1],primaryOBJ->vertNormals[normIndex+2]);
-
-			texIndex = 2*primaryOBJ->texIndices[faceIndex+j];	
-			glTexCoord2f(primaryOBJ->texCoords[texIndex], primaryOBJ->texCoords[texIndex+1]);
-	//		if(i < 10)
-	//			printf("texIndex:%d\ntexCoordu:%f\n", texIndex, primaryOBJ->texCoords[texIndex]);
-
-			vertIndex = 3*primaryOBJ->vIndices[faceIndex + j];	
-			glVertex3f(primaryOBJ->vertices[vertIndex],primaryOBJ->vertices[vertIndex+1],primaryOBJ->vertices[vertIndex+2]);
-		}
-
-	}
-	glEnd();
+	primaryOBJ->draw();
 //	glDrawElements(GL_QUADS, primaryOBJ->fCount*4, GL_UNSIGNED_INT, (void*)0);
 	//glutSwapBuffers() commented out while Anti Aliasing is active - must be put back in if AA is turned off
 //	glutSwapBuffers();
@@ -242,10 +213,12 @@ void draw_AA(){
 
 int main(int argc, char **argv){
 
-	primaryOBJ = (OBJObject*)calloc(sizeof(OBJObject), 1);
+	//primaryOBJ = (OBJObject*)calloc(sizeof(OBJObject), 1);
+	std::string fileName(argv[1]);
+	primaryOBJ = new model(fileName, verticesPerFace);
 	GLuint program;
 
-	parseObj(argv[1], primaryOBJ, verticesPerFace);
+//	parseObj(argv[1], primaryOBJ, verticesPerFace);
 
 	//standard Init routine
 	glutInit(&argc, argv);

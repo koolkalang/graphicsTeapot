@@ -30,3 +30,23 @@ void printMatrix(GLfloat m[16]){
 		printf("{%.2f, %.2f, %.2f, %.2f}\n", m[i],m[4 + i],m[8 + i],m[12 + i]);
 	}
 }
+
+//read in the whole file in one system call, parse line by line after
+char *readFile(const std::string fileName){
+
+	//Dr. Geist's file IO code almost verbatim	
+	FILE *filePointer;
+	char *content = NULL;
+	int fd, counter;
+	const char *c_fileName = fileName.c_str();
+	fd = open(c_fileName, O_RDONLY);
+	counter = lseek(fd, 0, SEEK_END);
+	close(fd);
+	content = (char *)calloc(1,(counter+1));
+	filePointer = fopen(c_fileName, "r");
+	//SLURP
+	counter = fread(content,sizeof(char),counter,filePointer);
+	content[counter] = '\0';
+	fclose(filePointer);
+	return content;
+}
