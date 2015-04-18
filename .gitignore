@@ -3,6 +3,8 @@
 *.swo
 *.sw*
 *.~
+#idk what this is
+.nfs*
 
 #	Compiled source files
 *.o

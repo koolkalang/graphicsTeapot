@@ -42,10 +42,29 @@ model::~model(){
 model& model::operator=(const model& rhs){
 	sourceFile = rhs.sourceFile;
 	vPerF = rhs.vPerF;	
+
+	vertNormals = rhs.vertNormals;
+	texCoords = rhs.texCoords;
+	tangents = rhs.tangents;
+	bitangents = rhs.bitangents;
+	vIndices = rhs.vIndices;
+	vNIndices = rhs.vNIndices;
+	texIndices = rhs.texIndices;
 	return *this;
 }
 
-model::model(const model&){
+model::model(const model& rhs){
+
+	sourceFile = rhs.sourceFile;
+	vPerF = rhs.vPerF;	
+
+	vertNormals = rhs.vertNormals;
+	texCoords = rhs.texCoords;
+	tangents = rhs.tangents;
+	bitangents = rhs.bitangents;
+	vIndices = rhs.vIndices;
+	vNIndices = rhs.vNIndices;
+	texIndices = rhs.texIndices;
 }
 
 //Tri code

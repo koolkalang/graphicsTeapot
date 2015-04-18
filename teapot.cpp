@@ -1,7 +1,8 @@
 #include "teapot.h"
+#include "loadTGA.h"
 
 model* primaryOBJ;
-textureUnit *bubbleTex;
+//textureUnit *bubbleTex;
 const double JITTER = 0.007;
 const int AA_PASSES = 20;
 const int verticesPerFace = 4;
@@ -193,6 +194,8 @@ void draw_stuff(){
 //	glutSwapBuffers();
 }
 
+
+
 //AntiAliasing routine
 void draw_AA(){
 	int view_pass;
@@ -209,6 +212,17 @@ void draw_AA(){
 	}
 	glAccum(GL_RETURN,1.0);
 	glutSwapBuffers();
+}
+
+GLuint cubeTexId;
+void initCubeMap(){
+
+	glGenTextures(1, &cubeTexId);
+	glActiveTexture(GL_TEXTURE1);
+
+	int width, height;
+	unsigned char* image;
+//	for(GLuint i = 0; i < 
 }
 
 int main(int argc, char **argv){
@@ -237,14 +251,16 @@ int main(int argc, char **argv){
 	glClearColor(0.1, 0.1, 0.1, 0.0);
 	glClearAccum(0.0, 0.0, 0.0, 0.0);
 	glEnable(GL_DEPTH_TEST);
-	bubbleTex = (textureUnit*)calloc(sizeof(textureUnit), 1);
-	bubbleTex->name = "bubble_color.ppm";
+/*	bubbleTex = (textureUnit*)calloc(sizeof(textureUnit), 1);
+	bubbleTex->name = (char*)"textures/bubble_color.ppm";
 	bubbleTex->texID = 1;
 	bubbleTex->format = GL_RGB;
 	bubbleTex->alpha = NULL_A;
 	bubbleTex->texunit = GL_TEXTURE0;
-	bubbleTex->combine = GL_MODULATE;
-	load_textures(bubbleTex);
+	bubbleTex->combine = GL_MODULATE;*/
+	TGAFILE *tgaTest = (TGAFILE*)calloc(sizeof(TGAFILE), 1);
+	LoadTGAFile((char*)"textures/fat-chance-in-hell_bk.tga", tgaTest);
+//	load_textures(bubbleTex);
 	Init();
 	create_lights();
 	create_material();
