@@ -1,6 +1,8 @@
 #include "teapot.h"
+#include "loadTGA.h"
 
-OBJObject *Bunny;
+model* primaryOBJ;
+//textureUnit *bubbleTex;
 const double JITTER = 0.007;
 const int AA_PASSES = 20;
 const int verticesPerFace = 4;
@@ -8,9 +10,14 @@ const int verticesPerFace = 4;
 const point eye = {3,3,3};
 const point view = {0,.8,0};
 const point up = {0,1,0};
+
 // Used to reference the different shaders.
 GLuint teapotShader;
 GLuint planeShader;
+const GLuint myBuffer = 1;
+const GLuint vertBuffer = 2;
+const GLuint normBuffer = 3;
+const GLuint indexBuffer = 4;
 
 point jitter_view()
 {
@@ -29,15 +36,12 @@ void Init(){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(65.0, 1.78, 0.1, 20.0);
-
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(eye.x, eye.y, eye.z,
 			view.x, view.y, view.z,
 			up.x, up.y, up.z);
 }
-
-
 
 void create_lights(){
 	//KEY LIGHT
@@ -118,13 +122,6 @@ void create_material(){
 	glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess);
 }
 
-
-
-GLuint myBuffer = 1;
-GLuint vertBuffer = 2;
-GLuint normBuffer = 3;
-GLuint indexBuffer = 4;
-
 void rotate(int angle, int x, int y, int z){
 	glTranslatef(.1,0,.1);
 	glRotatef(angle, x, y, z);
@@ -140,13 +137,7 @@ switch(key) {
                 glDeleteBuffers(1,&vertBuffer);
                 glDeleteBuffers(1,&normBuffer);
                 glDeleteBuffers(1,&indexBuffer);
-				free(Bunny->vertices);
-				free(Bunny->vertNormals);
-				free(Bunny->texCoords);
-				free(Bunny->vIndices);
-				free(Bunny->vNIndices);
-				free(Bunny->texIndices);
-				free(Bunny);
+				delete primaryOBJ;
                 exit(1);
 				break;
 		//rotate left
@@ -198,52 +189,29 @@ unsigned int set_shaders(char *fragFile, char *vertFile){
 }
 
 void draw_stuff(){
+
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	//mode, count, type, starting pointer 
+
+	// teapot plane
 	glUseProgram(teapotShader);
-	glBegin(GL_QUADS);
+	primaryOBJ->draw();
 
-	int i = 0;
-	int j = 0;
-	int vertIndex, faceIndex, normIndex;
-	for(i = 0; i < Bunny->fCount; i++){
-		faceIndex = 4*i;
-		for(j = 0; j < 4; j++){
-			normIndex = 3*Bunny->vNIndices[faceIndex + j];
-			glNormal3f(Bunny->vertNormals[normIndex],Bunny->vertNormals[normIndex+1],Bunny->vertNormals[normIndex+2]);
-			vertIndex = 3*Bunny->vIndices[faceIndex + j];
-			
-			glVertex3f(Bunny->vertices[vertIndex],Bunny->vertices[vertIndex+1],Bunny->vertices[vertIndex+2]);
-		}
-
-	}
-	glEnd();
-
-
+	// draw plane
 	glUseProgram(planeShader);
-
-	// Mirror Quad
 	glBegin(GL_QUADS);
-
 		glNormal3f(0,1,0);	
-
 		glVertex3f(-3,0,-3);
 		glVertex3f(-3,0,3);
 		glVertex3f(3,0,3);
 		glVertex3f(3,0,-3);
-/*
-		glVertex3f(-4.6919, 6.7599, -0.6532);	
-		glVertex3f(1.6748, -3.3882, 0.6841);	
-		glVertex3f(10.0216, -4.8014, 8.7911);	
-		glVertex3f(13.0387, 5.3467, 7.4536);	
-*/
-		// scaled down vertices
 	glEnd();
 
 //	glDrawElements(GL_QUADS, Bunny->fCount*4, GL_UNSIGNED_INT, (void*)0);
 	//glutSwapBuffers() commented out while Anti Aliasing is active - must be put back in if AA is turned off
 //	glutSwapBuffers();
 }
+
+
 
 //AntiAliasing routine
 void draw_AA(){
@@ -263,11 +231,25 @@ void draw_AA(){
 	glutSwapBuffers();
 }
 
+GLuint cubeTexId;
+void initCubeMap(){
+
+	glGenTextures(1, &cubeTexId);
+	glActiveTexture(GL_TEXTURE1);
+
+	int width, height;
+	unsigned char* image;
+//	for(GLuint i = 0; i < 
+}
+
 int main(int argc, char **argv){
 
-	Bunny = (OBJObject*)calloc(sizeof(OBJObject), 1);
+	//primaryOBJ = (OBJObject*)calloc(sizeof(OBJObject), 1);
+	std::string fileName(argv[1]);
+	primaryOBJ = new model(fileName, verticesPerFace);
+	GLuint program;
 
-	parseObj(argv[1], Bunny, verticesPerFace);
+//	parseObj(argv[1], primaryOBJ, verticesPerFace);
 
 	//standard Init routine
 	glutInit(&argc, argv);
@@ -286,28 +268,40 @@ int main(int argc, char **argv){
 	glClearColor(0.1, 0.1, 0.1, 0.0);
 	glClearAccum(0.0, 0.0, 0.0, 0.0);
 	glEnable(GL_DEPTH_TEST);
+/*	bubbleTex = (textureUnit*)calloc(sizeof(textureUnit), 1);
+	bubbleTex->name = (char*)"textures/bubble_color.ppm";
+	bubbleTex->texID = 1;
+	bubbleTex->format = GL_RGB;
+	bubbleTex->alpha = NULL_A;
+	bubbleTex->texunit = GL_TEXTURE0;
+	bubbleTex->combine = GL_MODULATE;*/
+	TGAFILE *tgaTest = (TGAFILE*)calloc(sizeof(TGAFILE), 1);
+	LoadTGAFile((char*)"textures/fat-chance-in-hell_bk.tga", tgaTest);
+//	load_textures(bubbleTex);
 	Init();
 	create_lights();
 	create_material();
+
 	teapotShader = set_shaders((char *) "phongEC.frag",(char *) "phongEC.vert");
 	planeShader = set_shaders((char *) "phongEC2.frag",(char *) "phongEC2.vert");
 
+/*
 	glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*Bunny->vCount*3, Bunny->vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*primaryOBJ->vCount*3, primaryOBJ->vertices, GL_STATIC_DRAW);
 	
 	//size, type, stride, starting pointer
 	glVertexPointer(3, GL_FLOAT, 3*sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, normBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*Bunny->vCount*3, Bunny->vertNormals, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*primaryOBJ->vCount*3, primaryOBJ->vertNormals, GL_STATIC_DRAW);
 	//type, stride, starting pointer
 	glNormalPointer(GL_FLOAT, 3*sizeof(GLfloat),(GLvoid*)0);
 
 //	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	//buffer binding target, size, data pointer, usage
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*Bunny->fCount*verticesPerFace*3, Bunny->vIndices, GL_STATIC_DRAW);
-	
-/*	GLsizei stride = sizeof(GLuint)*Bunny->fCount*verticesPerFace;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*primaryOBJ->fCount*verticesPerFace*3, primaryOBJ->vIndices, GL_STATIC_DRAW);
+*/	
+/*	GLsizei stride = sizeof(GLuint)*primaryOBJ->fCount*verticesPerFace;
 	GLuint attribute;
 	//making sure vertex indices work properly
 	attribute = glGetAttribLocation(program, "VertexPosition");

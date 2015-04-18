@@ -49,12 +49,13 @@ int parseObj(char *fileName, OBJObject *container, int vPerF){
 	//3 attributes per vertex, normal
 	container->vertices = (GLfloat *)calloc(sizeof(GLfloat), 3*container->vCount);
 	container->vertNormals = (GLfloat *)calloc(sizeof(GLfloat), 3*container->vCount);
+	container->tangents = (GLfloat *)calloc(sizeof(GLfloat), 3*container->vCount);
+	container->bitangents = (GLfloat *)calloc(sizeof(GLfloat), 3*container->vCount);
 	//2 attributes per texture coordinate
 	container->texCoords = (GLfloat *)calloc(sizeof(GLfloat), 2*vtCount);
 	
 	//3 * total vertices / face * faces for the vertex index, texture index, and normal index
 	container->vIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount);
-
 	container->vNIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount);
 	container->texIndices= (GLuint *)calloc(sizeof(GLuint), vPerF*container->fCount);
 
@@ -79,6 +80,18 @@ int parseObj(char *fileName, OBJObject *container, int vPerF){
 			for(int j = 0; j < 3; vNIndex++, j++) {
 				word = strtok(NULL, " ");
 				container->vertNormals[vNIndex] = (GLfloat)atof(word);
+			}
+		}
+		else if(!strcmp(word,"vx")){
+			for(int j = 0; j < 3; vxIndex++, j++) {
+				word = strtok(NULL, " ");
+				container->tangents[vxIndex] = (GLfloat)atof(word);
+			}
+		}
+		else if(!strcmp(word,"vy")){
+			for(int j = 0; j < 3; vyIndex++, j++) {
+				word = strtok(NULL, " ");
+				container->bitangents[vyIndex] = (GLfloat)atof(word);
 			}
 		}
 		else if(!strcmp(word,"vt")){

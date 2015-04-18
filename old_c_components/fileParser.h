@@ -12,8 +12,11 @@ typedef struct {
 	GLfloat *vertices;
 	GLfloat *vertNormals;
 	GLfloat *texCoords;
+	GLfloat *tangents;
+	GLfloat *bitangents;
 
 	//Indices for verts and normals stored in vertices
+	//tangents and bitangents are in 1:1 correspondence with vertices, so they don't need their own indices
 	GLuint *vIndices;
 	GLuint *vNIndices;
 	GLuint *texIndices;

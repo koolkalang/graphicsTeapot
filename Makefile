@@ -23,7 +23,7 @@
 
 # Written by DJ Edmonson
 # Warnings frequently signal eventual errors:
-CXXFLAGS=`sdl-config --cflags` -g -W -Wall -Weffc++ -Wextra -pedantic -O0
+CXXFLAGS=`sdl-config --cflags` -g -W -Wall -Wextra -pedantic -O0
 
 # Linker flags for both OS X and Linux
 LDFLAGS = -lglut -lGL -lGLU -lGLEW -lm 

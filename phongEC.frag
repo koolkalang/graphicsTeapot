@@ -1,12 +1,15 @@
 
 varying vec3 ec_vnormal, ec_vposition;
+uniform sampler2D texture;
 
 const int TOTAL_LIGHTS = 3;
 const double PI = 3.1415926535;
+const float diffuseWeight = 0.0;
+const float textureWeight = 1.0;
 
 void main(void){
 
-	vec3 P, N, L, V, H;
+	vec3 P, N, L, V, H, tColor;
 	vec3 EyePosition = vec3(4,4,4);
 	N = normalize(ec_vnormal);
 	P = ec_vposition;
@@ -15,6 +18,7 @@ void main(void){
 	vec4 spec_sum = vec4(0,0,0,0); 
 
 	float shininess = gl_FrontMaterial.shininess;
+	tColor = vec3(texture2D(texture, gl_TexCoord[0].st));
 
 	for(int i = 0; i < TOTAL_LIGHTS; i++){
 
@@ -23,7 +27,7 @@ void main(void){
 		V = normalize(EyePosition - P);
 		H = normalize(L + V);
 
-		vec4 diffuse_color = gl_FrontLightProduct[i].diffuse * max(dot(N,L), 0.0);
+		vec4 diffuse_color = (gl_FrontLightProduct[i].diffuse*diffuseWeight + vec4(tColor*textureWeight, 0.0)) * max(dot(N,L), 0.0);
 
 		//standard Blinn-Phong specular model
 		//vec4 specular_color = gl_FrontLightProduct[i].specular *pow(max(dot(H,N),0.0), shininess);
@@ -37,4 +41,5 @@ void main(void){
 		spec_sum += specular_color;
 	}
 	gl_FragColor = diffuse_sum + spec_sum;
+	//gl_FragColor = vec4(0, 1, 0 , 0);
 }
