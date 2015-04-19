@@ -60,7 +60,7 @@ void load_textures(textureUnit *texture){
 		glTexImage2D(GL_TEXTURE_2D, 0, texturePtr->format, imageWidth, imageHeight, 0, texturePtr->format, GL_UNSIGNED_BYTE, tb_final);
 		free(tb_final);
 		texturePtr++;
-	printf("texture read in properly");
+	printf("texture read in properly\n");
 	}
 
 	//Now activate all the texture units;
@@ -74,9 +74,9 @@ void load_textures(textureUnit *texture){
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, texturePtr->combine);
 		texturePtr++;
 	}
-	GLenum glErr = glGetError();
+/*	GLenum glErr = glGetError();
 	if(glErr != GL_NO_ERROR){
-		printf("glError: %s\n",
+		printf("glError reading in textures: %s\n",
 			     gluErrorString(glErr));
-	}
+	}*/
 }

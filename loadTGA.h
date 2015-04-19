@@ -17,4 +17,4 @@ typedef struct
     unsigned char *imageData;
 } TGAFILE;
 
-bool LoadTGAFile(char *filename, TGAFILE *tgaFile);
+bool LoadTGAFile(const char *filename, TGAFILE *tgaFile);
