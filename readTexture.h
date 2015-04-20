@@ -12,7 +12,7 @@
 
 typedef struct {
 	char *name;
-	int texID;
+	GLuint texID;
 	GLint format;
 	unsigned char (*alpha)(unsigned char *);
 	GLenum texunit;
