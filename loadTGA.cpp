@@ -4,7 +4,7 @@
 //---------------------------------------------------------------------------------------------------------------------------
 #include "loadTGA.h"
 
-bool LoadTGAFile(char *filename, TGAFILE *tgaFile)
+bool LoadTGAFile(const char *filename, TGAFILE *tgaFile)
 {
     FILE *filePtr;
     unsigned char ucharBad;
@@ -71,7 +71,7 @@ bool LoadTGAFile(char *filename, TGAFILE *tgaFile)
     }
 
     fclose(filePtr);
-	glBindTexture(GL_TEXTURE_2D, 5);
+/*	glBindTexture(GL_TEXTURE_2D, 5);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tgaFile->imageWidth, tgaFile->imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, tgaFile->imageData);
 	glActiveTexture(0);
 
@@ -80,6 +80,6 @@ bool LoadTGAFile(char *filename, TGAFILE *tgaFile)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	printf("TGA Successfully Loaded!!!");
+	printf("TGA Successfully Loaded!!!\n");*/
     return true;
 }

@@ -1,7 +1,6 @@
 #include "model.h"
 
 model::model(){
-	std::cout << "Default constructor called!!\n";
 	vertNormals = NULL;
 	texCoords = NULL;
 	tangents = NULL;
@@ -14,7 +13,6 @@ model::model(){
 
 model::model(const std::string fileName, const int verticesPerF){
 	//model();
-	std::cout << "Conversion constructor called!!\n";
 	vertNormals = NULL;
 	texCoords = NULL;
 	tangents = NULL;
@@ -28,7 +26,6 @@ model::model(const std::string fileName, const int verticesPerF){
 }
 
 model::~model(){
-	std::cout << "Destructor called!!\n";
 	free(vertices);
 	free(vertNormals);
 	free(texCoords);

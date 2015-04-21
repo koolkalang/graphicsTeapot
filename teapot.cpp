@@ -1,23 +1,75 @@
 #include "teapot.h"
 #include "loadTGA.h"
+#include <vector>
+#include <string>
+#include <iostream>
 
 model* primaryOBJ;
-//textureUnit *bubbleTex;
+textureUnit *teapotTex;
+GLuint cubeTexId;
+GLuint skyboxVAO, skyboxVBO;
+
 const double JITTER = 0.007;
 const int AA_PASSES = 20;
 const int verticesPerFace = 4;
 
-const point eye = {3,3,3};
+const point eye = {3,2,3};
 const point view = {0,.8,0};
 const point up = {0,1,0};
 
 // Used to reference the different shaders.
+GLuint defaultShader, skyboxShader;
 GLuint teapotShader;
 GLuint planeShader;
 const GLuint myBuffer = 1;
 const GLuint vertBuffer = 2;
 const GLuint normBuffer = 3;
 const GLuint indexBuffer = 4;
+
+GLfloat skyboxVertices[] = {
+    // Positions          
+    -10.0f,  10.0f, -10.0f,
+    -10.0f, -10.0f, -10.0f,
+     10.0f, -10.0f, -10.0f,
+     10.0f, -10.0f, -10.0f,
+     10.0f,  10.0f, -10.0f,
+    -10.0f,  10.0f, -10.0f,
+
+    -10.0f, -10.0f,  10.0f,
+    -10.0f, -10.0f, -10.0f,
+    -10.0f,  10.0f, -10.0f,
+    -10.0f,  10.0f, -10.0f,
+    -10.0f,  10.0f,  10.0f,
+    -10.0f, -10.0f,  10.0f,
+
+     10.0f, -10.0f, -10.0f,
+     10.0f, -10.0f,  10.0f,
+     10.0f,  10.0f,  10.0f,
+     10.0f,  10.0f,  10.0f,
+     10.0f,  10.0f, -10.0f,
+     10.0f, -10.0f, -10.0f,
+
+    -10.0f, -10.0f,  10.0f,
+    -10.0f,  10.0f,  10.0f,
+     10.0f,  10.0f,  10.0f,
+     10.0f,  10.0f,  10.0f,
+     10.0f, -10.0f,  10.0f,
+    -10.0f, -10.0f,  10.0f,
+
+    -10.0f,  10.0f, -10.0f,
+     10.0f,  10.0f, -10.0f,
+     10.0f,  10.0f,  10.0f,
+     10.0f,  10.0f,  10.0f,
+    -10.0f,  10.0f,  10.0f,
+    -10.0f,  10.0f, -10.0f,
+
+    -10.0f, -10.0f, -10.0f,
+    -10.0f, -10.0f,  10.0f,
+     10.0f, -10.0f, -10.0f,
+     10.0f, -10.0f, -10.0f,
+    -10.0f, -10.0f,  10.0f,
+     10.0f, -10.0f,  10.0f
+};
 
 point jitter_view()
 {
@@ -31,7 +83,7 @@ point jitter_view()
 	return viewJitter;
 }
 //Init sets up the view volume by placing the eye position and setting up the projection and modelview matrices
-void Init(){
+void initViewport(){
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -133,10 +185,6 @@ void keyBindings(unsigned char key, int x, int y)
 {
 switch(key) {
         case 'q':               
-                glDeleteBuffers(1,&myBuffer);
-                glDeleteBuffers(1,&vertBuffer);
-                glDeleteBuffers(1,&normBuffer);
-                glDeleteBuffers(1,&indexBuffer);
 				delete primaryOBJ;
                 exit(1);
 				break;
@@ -164,11 +212,18 @@ switch(key) {
     }
 }
 
-unsigned int set_shaders(char *fragFile, char *vertFile){
+unsigned int set_shaders(char *filePrefix){
 
+	// char fragFile, char *vertFiler *vs, *fs;
 	char *vs, *fs;
 	GLuint v, f, p;
 
+	char *vertFile = (char*)calloc(sizeof(char), 24); 
+	char *fragFile =  (char*)calloc(sizeof(char), 24); 
+	strcat(vertFile, filePrefix);
+	strcat(fragFile, filePrefix);
+	strcat(vertFile, (char*)".vert");
+	strcat(fragFile, (char*)".frag");
 	v = glCreateShader(GL_VERTEX_SHADER);
 	f = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -184,7 +239,11 @@ unsigned int set_shaders(char *fragFile, char *vertFile){
 	glAttachShader(p, f);
 	glAttachShader(p, v);
 	glLinkProgram(p);
+	//------------------------------------------------------------
 	glUseProgram(p);
+	//------------------------------------------------------------
+	free(vertFile);
+	free(fragFile);
 	return(p);
 }
 
@@ -192,8 +251,20 @@ void draw_stuff(){
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	// teapot plane
+	//Ugly hardcoded draw routine for the cube map
+	glDepthMask(GL_FALSE);
+	glUseProgram(skyboxShader);
+	glBindVertexArray(skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(skyboxShader, "skybox"), 0);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+
+	glDepthMask(GL_TRUE);
+	glUniform1i(glGetUniformLocation(defaultShader, "skybox"), 0);
+	glUniform1i(glGetUniformLocation(defaultShader, "teapotTex"), 1);
 	glUseProgram(teapotShader);
+//	glUniform1i(glGetUniformLocation(defaultShader, "skybox"), 10);
 	primaryOBJ->draw();
 
 	// draw plane
@@ -206,15 +277,13 @@ void draw_stuff(){
 		glVertex3f(3,0,-3);
 	glEnd();
 
-//	glDrawElements(GL_QUADS, Bunny->fCount*4, GL_UNSIGNED_INT, (void*)0);
 	//glutSwapBuffers() commented out while Anti Aliasing is active - must be put back in if AA is turned off
-//	glutSwapBuffers();
+	//	glutSwapBuffers();
 }
-
-
 
 //AntiAliasing routine
 void draw_AA(){
+
 	int view_pass;
 	
 	point reverseJitter;
@@ -231,92 +300,123 @@ void draw_AA(){
 	glutSwapBuffers();
 }
 
-GLuint cubeTexId;
 void initCubeMap(){
+	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
+	glActiveTexture(GL_TEXTURE0);
+	std::vector<const GLchar*> faces;
+	faces.push_back("textures/fat-chance-in-hell_ft.tga");
+	faces.push_back("textures/fat-chance-in-hell_bk.tga");
+	faces.push_back("textures/fat-chance-in-hell_dn.tga");
+	faces.push_back("textures/fat-chance-in-hell_up.tga");
+	faces.push_back("textures/fat-chance-in-hell_rt.tga");
+	faces.push_back("textures/fat-chance-in-hell_lf.tga");
+/*	faces.push_back("textures/mp_ss/ss_ft.tga");
+	faces.push_back("textures/mp_ss/ss_bk.tga");
+	faces.push_back("textures/mp_ss/ss_dn.tga");
+	faces.push_back("textures/mp_ss/ss_up.tga");
+	faces.push_back("textures/mp_ss/ss_rt.tga");
+	faces.push_back("textures/mp_ss/ss_lf.tga");*/
 
 	glGenTextures(1, &cubeTexId);
-	glActiveTexture(GL_TEXTURE1);
+	//glActiveTexture(GL_TEXTURE0);
+	TGAFILE *tgaFile = (TGAFILE*)calloc(sizeof(TGAFILE), 1);
 
-	int width, height;
-	unsigned char* image;
-//	for(GLuint i = 0; i < 
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTexId);
+	for(unsigned int i = 0; i < faces.size(); i++){
+
+		LoadTGAFile(faces[i], tgaFile);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, tgaFile->imageWidth, tgaFile->imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, tgaFile->imageData);
+		free(tgaFile->imageData);
+
+	}
+	free(tgaFile);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTexId);
 }
 
-int main(int argc, char **argv){
+void initSkyboxGeometry(){
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glBindVertexArray(0);
+	glEnableClientState(GL_VERTEX_ARRAY);
+}
 
-	//primaryOBJ = (OBJObject*)calloc(sizeof(OBJObject), 1);
-	std::string fileName(argv[1]);
-	primaryOBJ = new model(fileName, verticesPerFace);
-	GLuint program;
+void initTeapotTexture(char *fileName){
+	teapotTex = (textureUnit*)calloc(sizeof(textureUnit), 1);
+	teapotTex->name = fileName;
+	glGenTextures(1, &teapotTex->texID);
+	teapotTex->format = GL_RGB;
+	teapotTex->alpha = NULL_A;
+	teapotTex->texunit = GL_TEXTURE1;
+	teapotTex->combine = GL_MODULATE;
+	load_textures(teapotTex);
+}
 
-//	parseObj(argv[1], primaryOBJ, verticesPerFace);
-
-	//standard Init routine
+//standard Init routine
+void setupGlut(int argc, char **argv){
 	glutInit(&argc, argv);
-
 	glutInitDisplayMode(GLUT_RGBA|GLUT_DEPTH|GLUT_DOUBLE|GLUT_ACCUM);
 	glutInitWindowSize(1280,720);
 	glutInitWindowPosition(200, 50);
-	glutCreateWindow("Test Window");
-
+	glutCreateWindow("Teapot Contest");
 	//GLEW MUST be initialized AFTER creating the GLUT window- otherwise, will receive "missing GL version" error
 	GLenum err = glewInit();
 	if(GLEW_OK != err){
 		printf("ERROR: %s\n", glewGetErrorString(err));
 	}
-
 	glClearColor(0.1, 0.1, 0.1, 0.0);
 	glClearAccum(0.0, 0.0, 0.0, 0.0);
 	glEnable(GL_DEPTH_TEST);
-/*	bubbleTex = (textureUnit*)calloc(sizeof(textureUnit), 1);
-	bubbleTex->name = (char*)"textures/bubble_color.ppm";
-	bubbleTex->texID = 1;
-	bubbleTex->format = GL_RGB;
-	bubbleTex->alpha = NULL_A;
-	bubbleTex->texunit = GL_TEXTURE0;
-	bubbleTex->combine = GL_MODULATE;*/
-	TGAFILE *tgaTest = (TGAFILE*)calloc(sizeof(TGAFILE), 1);
-	LoadTGAFile((char*)"textures/fat-chance-in-hell_bk.tga", tgaTest);
-//	load_textures(bubbleTex);
-	Init();
+}
+
+int main(int argc, char **argv){
+
+	std::string fileName(argv[1]);
+	primaryOBJ = new model(fileName, verticesPerFace);
+
+	//setup glut window
+	setupGlut(argc, argv);
+
+	//setup the projection and view matrices
+	initViewport();
+
+	//initialize the cube map textures that will form our skybox
+	initCubeMap();
+
+	//standard light initialization.  Relatively unchanged from the Bunny project
 	create_lights();
+
+	//standard material initialization.  Relatively unchanged from the Bunny project
 	create_material();
 
-	teapotShader = set_shaders((char *) "phongEC.frag",(char *) "phongEC.vert");
-	planeShader = set_shaders((char *) "phongEC2.frag",(char *) "phongEC2.vert");
+	teapotShader = set_shaders((char *) "phongEC");
+	planeShader = set_shaders((char *) "phongEC2");
 
-/*
-	glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*primaryOBJ->vCount*3, primaryOBJ->vertices, GL_STATIC_DRAW);
-	
-	//size, type, stride, starting pointer
-	glVertexPointer(3, GL_FLOAT, 3*sizeof(GLfloat), (GLvoid*)0);
+	//This will read in the texture that will be applied to the teapot, if a texture is applied to the teapot at all
+	initTeapotTexture((char*)"textures/bubble_color.ppm");
 
-	glBindBuffer(GL_ARRAY_BUFFER, normBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*primaryOBJ->vCount*3, primaryOBJ->vertNormals, GL_STATIC_DRAW);
-	//type, stride, starting pointer
-	glNormalPointer(GL_FLOAT, 3*sizeof(GLfloat),(GLvoid*)0);
+	//setting up the main shader for the teapot
+	defaultShader = set_shaders((char*)"phongEC");
 
-//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-	//buffer binding target, size, data pointer, usage
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*primaryOBJ->fCount*verticesPerFace*3, primaryOBJ->vIndices, GL_STATIC_DRAW);
-*/	
-/*	GLsizei stride = sizeof(GLuint)*primaryOBJ->fCount*verticesPerFace;
-	GLuint attribute;
-	//making sure vertex indices work properly
-	attribute = glGetAttribLocation(program, "VertexPosition");
-	glEnableVertexAttribArray(attribute);
-	glVertexAttribPointer(attribute, 3, GL_FLOAT, GL_FALSE, stride, 0);
+	//setting up the shader for the skybox / cube map
+	skyboxShader = set_shaders((char*)"skybox");
 
-	//making sure vertex normal indices work properly
-	attribute = glGetAttribLocation(program, "VertexNormal");
-	glEnableVertexAttribArray(attribute);
-	glVertexAttribPointer(attribute, 3, GL_FLOAT, GL_FALSE, stride, 0);*/
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
+	//set up the skybox geometry cube
+	initSkyboxGeometry();
+
+	//Main loop functions
 	glutDisplayFunc(draw_AA);
-//	glutDisplayFunc(draw_stuff);
 	glutKeyboardFunc(keyBindings);
 	glutMainLoop();
+
 	return 0;
 }

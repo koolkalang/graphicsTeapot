@@ -8,8 +8,4 @@ Compiling and running:
 >make
 >./run <objectFileName>.obj
 
-Features:
 
--Basic Texture Mapping
--Environment Mapping
--Anti Aliasing
