@@ -3,13 +3,30 @@ CPSC 605 - final project
 Dr. Robert Geist
 Due 23 April 2015
 
-Compiling and running:
 
 >make
 >./run <objectFileName>.obj
 
+OR
+
+make clean && make && ./run teapot.obj
+
 Features:
 
 -Basic Texture Mapping
--Environment Mapping
+-Environment Mapping/Skybox
 -Anti Aliasing
+-Blended Transparency
+-Multiple Shaders
+
+Controls:
+a - rotate left
+d - rotate right
+w - rotate over
+s - rotate under
+z - positive z axis
+c - negative z axis
+up - positive y axis
+down - negative y axis
+left - negative x axis
+right - positive x axis

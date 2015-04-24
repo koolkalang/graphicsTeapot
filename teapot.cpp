@@ -35,48 +35,48 @@ const GLuint normBuffer = 3;
 const GLuint indexBuffer = 4;
 
 GLfloat skyboxVertices[] = {
-    // Positions          
-    -10.0f,  10.0f, -10.0f,
-    -10.0f, -10.0f, -10.0f,
-     10.0f, -10.0f, -10.0f,
-     10.0f, -10.0f, -10.0f,
-     10.0f,  10.0f, -10.0f,
-    -10.0f,  10.0f, -10.0f,
+	// Positions          
+	-10.0f,  10.0f, -10.0f,
+	-10.0f, -10.0f, -10.0f,
+	10.0f, -10.0f, -10.0f,
+	10.0f, -10.0f, -10.0f,
+	10.0f,  10.0f, -10.0f,
+	-10.0f,  10.0f, -10.0f,
 
-    -10.0f, -10.0f,  10.0f,
-    -10.0f, -10.0f, -10.0f,
-    -10.0f,  10.0f, -10.0f,
-    -10.0f,  10.0f, -10.0f,
-    -10.0f,  10.0f,  10.0f,
-    -10.0f, -10.0f,  10.0f,
+	-10.0f, -10.0f,  10.0f,
+	-10.0f, -10.0f, -10.0f,
+	-10.0f,  10.0f, -10.0f,
+	-10.0f,  10.0f, -10.0f,
+	-10.0f,  10.0f,  10.0f,
+	-10.0f, -10.0f,  10.0f,
 
-     10.0f, -10.0f, -10.0f,
-     10.0f, -10.0f,  10.0f,
-     10.0f,  10.0f,  10.0f,
-     10.0f,  10.0f,  10.0f,
-     10.0f,  10.0f, -10.0f,
-     10.0f, -10.0f, -10.0f,
+	10.0f, -10.0f, -10.0f,
+	10.0f, -10.0f,  10.0f,
+	10.0f,  10.0f,  10.0f,
+	10.0f,  10.0f,  10.0f,
+	10.0f,  10.0f, -10.0f,
+	10.0f, -10.0f, -10.0f,
 
-    -10.0f, -10.0f,  10.0f,
-    -10.0f,  10.0f,  10.0f,
-     10.0f,  10.0f,  10.0f,
-     10.0f,  10.0f,  10.0f,
-     10.0f, -10.0f,  10.0f,
-    -10.0f, -10.0f,  10.0f,
+	-10.0f, -10.0f,  10.0f,
+	-10.0f,  10.0f,  10.0f,
+	10.0f,  10.0f,  10.0f,
+	10.0f,  10.0f,  10.0f,
+	10.0f, -10.0f,  10.0f,
+	-10.0f, -10.0f,  10.0f,
 
-    -10.0f,  10.0f, -10.0f,
-     10.0f,  10.0f, -10.0f,
-     10.0f,  10.0f,  10.0f,
-     10.0f,  10.0f,  10.0f,
-    -10.0f,  10.0f,  10.0f,
-    -10.0f,  10.0f, -10.0f,
+	-10.0f,  10.0f, -10.0f,
+	10.0f,  10.0f, -10.0f,
+	10.0f,  10.0f,  10.0f,
+	10.0f,  10.0f,  10.0f,
+	-10.0f,  10.0f,  10.0f,
+	-10.0f,  10.0f, -10.0f,
 
-    -10.0f, -10.0f, -10.0f,
-    -10.0f, -10.0f,  10.0f,
-     10.0f, -10.0f, -10.0f,
-     10.0f, -10.0f, -10.0f,
-    -10.0f, -10.0f,  10.0f,
-     10.0f, -10.0f,  10.0f
+	-10.0f, -10.0f, -10.0f,
+	-10.0f, -10.0f,  10.0f,
+	10.0f, -10.0f, -10.0f,
+	10.0f, -10.0f, -10.0f,
+	-10.0f, -10.0f,  10.0f,
+	10.0f, -10.0f,  10.0f
 };
 
 
@@ -91,9 +91,10 @@ point jitter_view()
 	glTranslatef(viewJitter.x, viewJitter.y, viewJitter.z);
 	return viewJitter;
 }
+
+
 //Init sets up the view volume by placing the eye position and setting up the projection and modelview matrices
 void initViewport(){
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(40.0, 1.78, 0.1, 30.0);
@@ -104,7 +105,9 @@ void initViewport(){
 			up.x, up.y, up.z);
 }
 
-void create_lights(){
+
+void create_lights()
+{
 	//KEY LIGHT
 	float KEY_ambient[] =  { 0.0, 0.0, 0.0, 0.0 };
 	float KEY_diffuse[] =  { 1.0, 1.0, 1.0, 0.0 };
@@ -127,10 +130,10 @@ void create_lights(){
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, KEY_direction);
 
 	float FILL_ambient[] =  { 0.0, 0.0, 0.0, 0.0 };
-	float FILL_diffuse[] =  { 0.6, 0.6, 0.6, 0.0 };
+	float FILL_diffuse[] =  { 0.7, 0.6, 0.3, 0.0 };
 	float FILL_specular[] = { 0.6, 0.6, 0.6, 0.0 };
 	float FILL_position[]=  {-2.0, 1.0, .5, 1.0};
-//	float FILL_direction[]= {2.0, -.5, -1.5, 1.0};
+	//	float FILL_direction[]= {2.0, -.5, -1.5, 1.0};
 	float FILL_direction[]= {2.0, .5, -1.5, 1.0};
 
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,FILL_ambient);
@@ -171,18 +174,20 @@ void create_lights(){
 	glEnable(GL_LIGHT2);
 }
 
+
 void create_material(){
 	//CHOCOLATE MATERIAL!!!
-	float mat_ambient[] = {0.0,0.0,0.0,1.0};
-	float mat_diffuse[] = {0.30, 0.30,0.30,0.4};
-	float mat_specular[] = {1.0,1.0,1.0,1.0};
-	float mat_shininess[] = {10.0};
+	float mat_ambient[] = {0.0, 0.0, 0.0, 1.0};
+	float mat_diffuse[] = {0.26, 0.23, 0.26,0.4};
+	float mat_specular[] = {.7,.7,.7,.7};
+	float mat_shininess[] = {15.0};
 
 	glMaterialfv(GL_FRONT,GL_AMBIENT,mat_ambient);
 	glMaterialfv(GL_FRONT,GL_DIFFUSE,mat_diffuse);
 	glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
 	glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess);
 }
+
 
 void rotate(int angle, int x, int y, int z){
 	glTranslatef(.1,0,.1);
@@ -191,67 +196,71 @@ void rotate(int angle, int x, int y, int z){
 	glutPostRedisplay();
 }
 
+
 void keyBindings(unsigned char key, int x, int y)
 {
-switch(key) {
-        case 'q':               
-				delete primaryOBJ;
-                exit(1);
-				break;
-		//rotate left
+x=x;
+y=y;
+	switch(key) {
+		case 'q':               
+			delete primaryOBJ;
+			exit(1);
+			break;
+			//rotate left
 		case 'd':
-				rotate(5, 0, 1, 0);
-				break;
+			rotate(5, 0, 1, 0);
+			break;
 		case 'a':
-				rotate(-5, 0, 1, 0);
-				break;
+			rotate(-5, 0, 1, 0);
+			break;
 		case 'w':
-				rotate(5, 1, 0, 0);
-				break;
+			rotate(5, 1, 0, 0);
+			break;
 		case 's':
-				rotate(-5, 1, 0, 0);
-				break;
+			rotate(-5, 1, 0, 0);
+			break;
 		case 'r':
-				rotate(5, 0, 0, 1);
-				break;
+			rotate(5, 0, 0, 1);
+			break;
 		case 'f':
-				rotate(-5, 0, 0, 1);
-				break;
+			rotate(-5, 0, 0, 1);
+			break;
 		case 'c':
-				glTranslatef(0,0,0.1);
-				glutPostRedisplay();
-				break;
+			glTranslatef(0,0,0.1);
+			glutPostRedisplay();
+			break;
 		case 'z':
-				glTranslatef(0,0,-.1);
-				glutPostRedisplay();
-				break;
-        default:
-                break;
-    }
+			glTranslatef(0,0,-.1);
+			glutPostRedisplay();
+			break;
+		default:
+			break;
+	}
 }
+
 
 void translateCam(int key, int x, int y)
 {
-switch(key) {
+	switch(key) {
 		case GLUT_KEY_UP:
-				glTranslatef(0,.1,0);
-				glutPostRedisplay();
-				break;
+			glTranslatef(0,-.1,0);
+			glutPostRedisplay();
+			break;
 		case GLUT_KEY_DOWN:
-				glTranslatef(0,-0.1,0);
-				glutPostRedisplay();
-				break;
+			glTranslatef(0,0.1,0);
+			glutPostRedisplay();
+			break;
 		case GLUT_KEY_LEFT:
-				glTranslatef(0.1,0,0);
-				glutPostRedisplay();
-				break;
+			glTranslatef(0.1,0,0);
+			glutPostRedisplay();
+			break;
 		case GLUT_KEY_RIGHT:
-				glTranslatef(-0.1,0,0);
-				glutPostRedisplay();
-				break;
-        default:
-                break;
-    }
+			glTranslatef(-0.1,0,0);
+			glutPostRedisplay();
+			break;
+		default:
+			break;
+	}
 }
 
 
@@ -290,17 +299,19 @@ unsigned int set_shaders(char *filePrefix){
 	return(p);
 }
 
+
 void renderCamera()
 {
-	
+
 }
+
 
 void drawCubeMap(const point loc)
 {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, cubeTexId, 0);
 
-//	glMatrixMode(GL_PROJECTION);
-//	glLoadIdentity();
+	//	glMatrixMode(GL_PROJECTION);
+	//	glLoadIdentity();
 	gluPerspective(90,1,1,1000);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -309,49 +320,41 @@ void drawCubeMap(const point loc)
 	glTranslatef(loc.x, loc.y, loc.z);
 }
 
+
 void draw_stuff(){
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	//Ugly hardcoded draw routine for the cube map
-	
 
+	//Ugly hardcoded draw routine for the cube map
 	glUseProgram(skyboxShader);
 	glBindVertexArray(skyboxVAO);
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(skyboxShader, "skybox"), 0);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
-
-
-
 	glDepthMask(GL_TRUE);
-	// draw plane
+
+	// plane
 	glDepthMask(GL_TRUE);
 	glUseProgram(planeShader);
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(planeShader, "tex"), 0);
-//	glUniform1i(glGetUniformLocation(planeShader, "woodTex"), 0);
+	//	glUniform1i(glGetUniformLocation(planeShader, "woodTex"), 0);
 	// glUniform1i(glGetUniformLocation(planeShader, "waterTexNormal"), 1);
 	// attribute buffers
 	glBegin(GL_QUADS);
-			glNormal3f(0,1,0);
-
-			glTexCoord2f(0,0); 
-			glVertex3f(-4, 0,-4);
-
-			glTexCoord2f(0,1); 
-			glVertex3f(-4, 0, 4);
-
-			glTexCoord2f(1,1); 
-			glVertex3f( 4, 0, 4);
-
-			glTexCoord2f(1,0); 
-			glVertex3f( 4, 0,-4);
+	glNormal3f(0,1,0);
+	glTexCoord2f(0,0); 
+	glVertex3f(-4, 0,-4);
+	glTexCoord2f(0,1); 
+	glVertex3f(-4, 0, 4);
+	glTexCoord2f(1,1); 
+	glVertex3f( 4, 0, 4);
+	glTexCoord2f(1,0); 
+	glVertex3f( 4, 0,-4);
 	glEnd();
 
-
-
-
+	// teapot
 	glUseProgram(teapotShader);
 	glUniform1i(glGetUniformLocation(defaultShader, "skybox"), 0);
 	glUniform1i(glGetUniformLocation(defaultShader, "teapotTex"), 1);
@@ -375,7 +378,7 @@ void draw_AA()
 		//after the jittered image is recorded in the accumulation buffer
 		reverseJitter = jitter_view();
 		//draw to dynamic cubemap
-	//	drawCubeMap(reverseJitter);	
+		//	drawCubeMap(reverseJitter);	
 		draw_stuff();	
 		glAccum(GL_ACCUM,1.0/(float)(AA_PASSES));
 		glTranslatef(-reverseJitter.x,-reverseJitter.y,-reverseJitter.z);
@@ -416,12 +419,12 @@ void initCubeMap()
 
 	free(tgaFile);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-   // glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTexId);
-   
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	// glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTexId);
+
 }
 
 
@@ -451,14 +454,14 @@ void initDynamicCubeMap()
 
 void initSkyboxGeometry()
 {
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
-    glBindVertexArray(skyboxVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-    glBindVertexArray(0);
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glBindVertexArray(0);
 	glEnableClientState(GL_VERTEX_ARRAY);
 }
 
@@ -476,7 +479,7 @@ void initTeapotTexture(char *fileName)
 }
 
 
-void initWoodTexture(char *fileName)
+void initCircleTexture(char *fileName)
 {
 	// load TGA file
 	TGAFILE *tgaFile = (TGAFILE*)calloc(sizeof(TGAFILE), 1);
@@ -488,14 +491,14 @@ void initWoodTexture(char *fileName)
 	glBindTexture(GL_TEXTURE_2D, woodTex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tgaFile->imageWidth, tgaFile->imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, tgaFile->imageData);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tgaFile->imageWidth, tgaFile->imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, tgaFile->imageData);
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-   // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-//	glBindTexture(GL_TEXTURE_2D, woodTex);
+	//	glBindTexture(GL_TEXTURE_2D, woodTex);
 	std::cout<<woodTex<<"\n";
 
 	// free data
@@ -524,6 +527,7 @@ void setupGlut(int argc, char **argv){
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+
 int main(int argc, char **argv) 
 {
 	std::string fileName(argv[1]);
@@ -544,13 +548,13 @@ int main(int argc, char **argv)
 	//standard material initialization.  Relatively unchanged from the Bunny project
 	create_material();
 	teapotShader = set_shaders((char *)"phongEC");
-	planeShader = set_shaders((char *)"phongEC2");
+	planeShader = set_shaders((char *)"plane");
 
 	// This will read in the texture that will be applied to the teapot, if a texture is applied to the teapot at all
 	// initTeapotTexture((char*)"textures/bubble_color.ppm");
-	initWoodTexture((char*)"textures/circle.tga");
+	initCircleTexture((char*)"textures/circle.tga");
 	// setting up the main shader for the teapot
-	defaultShader = set_shaders((char*)"phongEC2");
+	defaultShader = set_shaders((char*)"phongEC");
 	// setting up the shader for the skybox / cube map
 	skyboxShader = set_shaders((char*)"skybox");
 	// set up the skybox geometry cube

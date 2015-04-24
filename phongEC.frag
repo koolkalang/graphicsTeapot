@@ -5,9 +5,9 @@ uniform samplerCube skybox;
 
 const int TOTAL_LIGHTS = 3;
 const double PI = 3.1415926535;
-const float diffuseWeight = 0.6;
-const float textureWeight = 0.5;
-const float enviroMapWeight = 0.3;
+const float diffuseWeight = 0.3;
+const float textureWeight = 0.3;
+const float enviroMapWeight = 0.9;
 
 void main(void) {
 
@@ -57,6 +57,9 @@ void main(void) {
 //	gl_FragColor = enviroColor;
 	gl_FragColor = diffuse_sum + spec_sum;
 	gl_FragColor.a = 1;
+
+	gl_FragColor	 = clamp(gl_FragColor, 0.0, 1.0);
+//	gl_FragColor.a = 0;
 //	gl_FragColor = vec4(diffuse_sum.a,diffuse_sum.a,diffuse_sum.a,diffuse_sum.a);
 //	gl_FragColor = vec4(0, 1, 0 , 0);
 }

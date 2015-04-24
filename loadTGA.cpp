@@ -54,8 +54,6 @@ bool LoadTGAFile(const char *filename, TGAFILE *tgaFile)
 
     // Color mode -> 3 = BGR, 4 = BGRA.
     colorMode = tgaFile->bitCount / 8;
-	if(filename=="circle.tga")
-		colorMode = 4;
     imageSize = tgaFile->imageWidth * tgaFile->imageHeight * colorMode;
 
     // Allocate memory for the image data.
