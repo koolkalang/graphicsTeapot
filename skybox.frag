@@ -10,4 +10,5 @@ void main()
 	texCoords[1] = texCoords[1]*-1;
 	tColor = texture(skybox, texCoords);
 	gl_FragColor = tColor; 
+//	gl_FragColor.a = 0; 
 }

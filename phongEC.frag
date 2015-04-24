@@ -5,11 +5,11 @@ uniform samplerCube skybox;
 
 const int TOTAL_LIGHTS = 3;
 const double PI = 3.1415926535;
-const float diffuseWeight = 0.5;
+const float diffuseWeight = 0.6;
 const float textureWeight = 0.5;
-const float enviroMapWeight = 0.5;
+const float enviroMapWeight = 0.3;
 
-void main(void){
+void main(void) {
 
 	vec3 P, N, L, V, H, R;
 	vec3 tColor;
@@ -34,7 +34,7 @@ void main(void){
 		H = normalize(L + V);
 
 		//using only the teapot texture as a texture.  Commented out for debugging purposes	
-	  	//vec4 diffuse_color = (gl_FrontLightProduct[i].diffuse*diffuseWeight + vec4(tColor*textureWeight, 0.0)) * max(dot(N,L), 0.0);
+//	  	vec4 diffuse_color = (gl_FrontLightProduct[i].diffuse*diffuseWeight + vec4(tColor*textureWeight, 0.0)) * max(dot(N,L), 0.0);
 
 		//using only the environment map as a texture.  Commented out for debugging purposes	
 	  	vec4 diffuse_color = (gl_FrontLightProduct[i].diffuse*diffuseWeight + enviroColor*enviroMapWeight) * max(dot(N,L), 0.0);
@@ -56,5 +56,7 @@ void main(void){
 
 //	gl_FragColor = enviroColor;
 	gl_FragColor = diffuse_sum + spec_sum;
+	gl_FragColor.a = 1;
+//	gl_FragColor = vec4(diffuse_sum.a,diffuse_sum.a,diffuse_sum.a,diffuse_sum.a);
 //	gl_FragColor = vec4(0, 1, 0 , 0);
 }
